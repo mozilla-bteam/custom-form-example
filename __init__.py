@@ -22,7 +22,7 @@ class LoginForm(FlaskForm):
 class CustomForm(FlaskForm):
 	name = StringField('Name', [validators.DataRequired(), validators.Length(min=4, max=25)])
 	email = StringField('Email Address', [validators.Length(min=6, max=35)])
-	accept_tos = BooleanField('I accept the TOS', [validators.DataRequired()])
+	terms = BooleanField('I accept terms', [validators.DataRequired()])
 
 #
 #Database Models
@@ -71,11 +71,24 @@ def callback():
 
 @app.route('/form', methods=('GET', 'POST'))
 def submit():
-    form = CustomForm()
-    if request.method == 'POST':
-    	print(request.form['name'])
-    	return redirect('/')
-    return render_template('customform.html', form=form)
+	form = CustomForm()
+	if 'token' in session:
+	    if request.method == 'POST':
+	    	description = '\n>>Name' + '\n' + request.form['name'] + '\n>>Email' + '\n' + request.form['email'] + '\n>>I accept terms' + '\n' + request.form['terms'] 
+	    	data = {
+	    		'product' : 'IPC',
+	    		'component' : 'Marketing',
+	    		'version' : 'unspecified',
+	    		'summary' : 'Custom Form Response',
+	    		'description' : description
+	    	}
+	    	r = requests.post(config.URL + '/rest/bug?token=' + session['token'], data=data)
+	    	return redirect('/')
+	    return render_template('customform.html', form=form)
+	else:
+		return redirect('/')
+	
+
 
 #
 #Main
