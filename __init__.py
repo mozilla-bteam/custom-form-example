@@ -61,7 +61,7 @@ def login():
 		if r.status_code == 200:
 			print(r.json())
 			# user = User(request.form['username'],r.json()[0],r.json()[1])
-			session['token'] = r.json()[1]
+			session['api_key'] = r.json()[1]
 			redirect('/form')
 		print(r.status_code)
 	return render_template('loginform.html', form=form, url=config.URL)
@@ -82,17 +82,17 @@ def callback():
 			return json.dumps({'result' : rand_id})
 
 	elif request.method == 'GET':
-		# content = request.get_json(force=True)
-		# client_api_key = User.query.filter_by(rand_id=content['callback_result'], client_api_login=content['client_api_login']).first()
-		# if(client_api_key):
-		return 'Success'
+		client_api_key = User.query.filter_by(rand_id=request.args.get('callback_result'), client_api_login=request.args.get('client_api_login')).first().client_api_key
+		if(client_api_key):
+			session['api_key'] = client_api_key
+			return redirect('/form')
 
 
 
 @app.route('/form', methods=['GET', 'POST'])
 def submit():
 	form = CustomForm()
-	if 'token' in session:
+	if 'api_key' in session:
 	    if request.method == 'POST':
 	    	description = '\n>>Name' + '\n' + request.form['name'] + '\n>>Email' + '\n' + request.form['email'] + '\n>>I accept terms' + '\n' + request.form['terms'] 
 	    	data = {
@@ -102,7 +102,7 @@ def submit():
 	    		'summary' : 'Custom Form Response',
 	    		'description' : description
 	    	}
-	    	r = requests.post(config.URL + '/rest/bug?token=' + session['token'], data=data)
+	    	r = requests.post(config.URL + '/rest/bug?api_key=' + session['api_key'], data=data)
 	    	return redirect('/')
 	    return render_template('customform.html', form=form)
 	else:
