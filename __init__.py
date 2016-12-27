@@ -4,12 +4,14 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, validators
 import requests
 import config
+import os, codecs
+import json
 
 app = Flask(__name__)
 app.secret_key = 'a_random_string_which_you_need_to_protect_your_custom_form_during_production'
 app.config['DEBUG'] = True
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
-# db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test2.db'
+db = SQLAlchemy(app)
 
 #
 #Form Models
@@ -28,19 +30,19 @@ class CustomForm(FlaskForm):
 #Database Models
 #
 
-# class User(db.Model):
-# 	id = db.Column(db.Integer, primary_key=True)
-# 	username = db.Column(db.String(80), unique=True)
-# 	token_id = db.Column(db.String(120), unique=True)
-# 	token = db.Column(db.String(120), unique=True)
+class User(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	rand_id = db.Column(db.String(80))
+	client_api_login = db.Column(db.String(120))
+	client_api_key = db.Column(db.String(120))
 
-# 	def __init__(self, username, token_id, token):
-# 		self.username = username
-# 		self.token_id = token_id
-# 		self.token = token
+	def __init__(self, rand_id, client_api_login, client_api_key):
+		self.rand_id = rand_id
+		self.client_api_login = client_api_login
+		self.client_api_key = client_api_key
 
-# 	def __repr__(self):
-# 		return '<User %r>' % self.username
+	def __repr__(self):
+		return '<User %r>' % self.rand_id
 
 #
 #Routes
@@ -48,7 +50,7 @@ class CustomForm(FlaskForm):
 
 @app.route('/')
 def hello():
-	url = config.URL + 'auth.cgi?callback=http://788119bf.ngrok.io/callback&description=customforms'if config.LOGIN_METHOD else '/login'
+	url = config.URL + '/auth.cgi?callback=http://788119bf.ngrok.io/callback&description=customforms'if config.LOGIN_METHOD else '/login'
 	return render_template('index.html', url=url)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -64,12 +66,30 @@ def login():
 		print(r.status_code)
 	return render_template('loginform.html', form=form, url=config.URL)
 
-@app.route('/callback')
+@app.route('/callback', methods=['GET', 'POST'])
 def callback():
-	return {result: 'Thisisauniquestoken'}
+	if request.method == 'POST':
+		content = request.get_json(force=True)
+		if (content):
+			client_api_login = content['client_api_login']
+			client_api_key = content['client_api_key']
+
+		if (client_api_key and client_api_login):
+			rand_id = codecs.encode(os.urandom(16),'hex').decode()
+			user = User(rand_id, client_api_login, client_api_key)
+			db.session.add(user)
+			db.session.commit()
+			return json.dumps({'result' : rand_id})
+
+	elif request.method == 'GET':
+		# content = request.get_json(force=True)
+		# client_api_key = User.query.filter_by(rand_id=content['callback_result'], client_api_login=content['client_api_login']).first()
+		# if(client_api_key):
+		return 'Success'
 
 
-@app.route('/form', methods=('GET', 'POST'))
+
+@app.route('/form', methods=['GET', 'POST'])
 def submit():
 	form = CustomForm()
 	if 'token' in session:
@@ -87,8 +107,6 @@ def submit():
 	    return render_template('customform.html', form=form)
 	else:
 		return redirect('/')
-	
-
 
 #
 #Main
