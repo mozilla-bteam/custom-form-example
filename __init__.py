@@ -50,7 +50,7 @@ class User(db.Model):
 
 @app.route('/')
 def hello():
-	url = config.URL + '/auth.cgi?callback=http://788119bf.ngrok.io/callback&description=customforms'if config.LOGIN_METHOD else '/login'
+	url = config.URL + '/auth.cgi?callback=' + config.SITE_URL + '/callback&description=customforms'if config.LOGIN_METHOD else '/login'
 	return render_template('index.html', url=url)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -91,20 +91,23 @@ def callback():
 
 @app.route('/form', methods=['GET', 'POST'])
 def submit():
-	form = CustomForm()
 	if 'api_key' in session:
-	    if request.method == 'POST':
-	    	description = '\n>>Name' + '\n' + request.form['name'] + '\n>>Email' + '\n' + request.form['email'] + '\n>>I accept terms' + '\n' + request.form['terms'] 
-	    	data = {
-	    		'product' : 'IPC',
-	    		'component' : 'Marketing',
-	    		'version' : 'unspecified',
-	    		'summary' : 'Custom Form Response',
-	    		'description' : description
-	    	}
-	    	r = requests.post(config.URL + '/rest/bug?api_key=' + session['api_key'], data=data)
-	    	return redirect('/')
-	    return render_template('customform.html', form=form)
+		form = CustomForm()
+		if request.method == 'POST':
+			description = '\n>>Name' + '\n' + request.form['name'] + '\n>>Email' + '\n' + request.form['email'] + '\n>>I accept terms' + '\n' + request.form['terms']
+			data = {
+			'product' : 'Firefox',
+			'component' : 'General',
+			'version' : 'unspecified',
+			'summary' : 'Custom Form Response',
+			'description' : description,
+			'op_sys' : 'Mac OS X'
+			}
+			r = requests.post(config.URL + '/rest/bug?api_key=' + session['api_key'], data=data)
+			print(r.status_code)
+			print(r.json())
+			return redirect('/')
+		return render_template('customform.html', form=form)
 	else:
 		return redirect('/')
 
