@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+  {% block title %}
+  {% endblock %}
+  </title>
+</head>
+<body>
+<div class="container">
+<link type="text/css" rel="stylesheet" href="static/css/lib/materialize.css"  media="screen,projection"/>
+<link rel="stylesheet" type="text/css" href="static/css/style.css">
+<div class="row">
+<div class="pad-top"></div>
+</div>
+<div class="row"  style="text-align: center;">
+        <div class="col s12 m12">
+          <div class="card bmo">
+            <div class="card-content white-text">
+<div class="row">
+<div class="col s3 offset-s9">
+<img class="tabzilla" src="static/img/tabzilla.png">
+</div>
+{% block content %}
+{% endblock %}
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="static/js/lib/materialize.js"></script>
+
+</body>
+</html>
