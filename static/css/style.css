@@ -3,11 +3,16 @@ body {
 	background-color: #404040;
 }
 
-/*.input-field input[type=text]:focus + label {
-     color: #0095dd;
-}
 
 .input-field input[type=text]:focus {
+     color: #404040;
+}
+
+.input-field input[type=text] {
+     color: #404040;
+}
+
+/*.input-field input[type=text]:focus {
 	border-bottom: 1px solid #0095dd;
 	box-shadow: 0 1px 0 0 #0095dd;
 }*/
