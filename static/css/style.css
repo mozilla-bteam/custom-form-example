@@ -3,14 +3,14 @@ body {
 	background-color: #404040;
 }
 
-.input-field input[type=text]:focus + label {
+/*.input-field input[type=text]:focus + label {
      color: #0095dd;
 }
 
 .input-field input[type=text]:focus {
 	border-bottom: 1px solid #0095dd;
 	box-shadow: 0 1px 0 0 #0095dd;
-}
+}*/
 
 .desc {
 	color: #404040 !important;
@@ -27,4 +27,20 @@ body {
 
 .pad-top {
 	height: 4vh;
+}
+
+.picker__box{
+    background-color: #e7e5de !important;
+}
+
+.picker__weekday-display {
+	background-color: #008bce !important;	
+}
+
+.radio {
+  display:block;
+  padding-top: 30px;
+  font-size: 8pt;
+  text-align: left !important;
+  text-decoration: none;
 }

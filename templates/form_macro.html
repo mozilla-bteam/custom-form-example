@@ -1,7 +1,17 @@
 {% macro render_field(field) %}
 <div class="row">
 <div class="input-field col s6 offset-s3">
+{% if field.type in ('DateField', 'DateTimeField') %}
+  {{ field(class='datepicker', placeholder='',**kwargs)|safe }}
+{% elif field.type in ('RadioField') %}
+  {{ field(class='radio', placeholder='',**kwargs)|safe }}
+{% elif field.type in ('TextAreaField') %}
+  {{ field(class='materialize-textarea',**kwargs)|safe }}
+{% elif field.type in ('SelectField') %}
+  {{ field(class='',**kwargs)|safe }}
+{% else %}
   {{ field(placeholder='',**kwargs)|safe }}
+{% endif %}
    {{ field.label }}
   {% if field.errors %}
     <ul class=errors>

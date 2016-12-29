@@ -19,12 +19,12 @@ CRM Form
 </div>
 
 <div class="row">
-<form method=post class="col s12">
-    {{ render_field(form.name) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.terms) }}
+<form method='post' class="col s12">
+{% for field in form if field.widget.input_type != 'hidden'%}
+    {{ render_field(field) }}
+{% endfor %}
 <br><br>
-<input class="waves-effect waves-light btn bmobtn" type=submit value=Submit>
+<input class="waves-effect waves-light btn" type=submit value=Submit>
 </form>
 </div>
  {% endblock %}

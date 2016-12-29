@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, validators
+from wtforms import StringField, PasswordField, BooleanField, DateField, RadioField, TextAreaField, SelectField, SelectMultipleField
+from wtforms import validators
 import requests
 import config
 import os, codecs
@@ -24,6 +25,11 @@ class LoginForm(FlaskForm):
 class CustomForm(FlaskForm):
 	name = StringField('Name', [validators.DataRequired(), validators.Length(min=4, max=25)])
 	email = StringField('Email Address', [validators.Length(min=6, max=35)])
+	dob = DateField('Date of Birth', format='%m/%d/%Y')
+	lang = RadioField('Your Primary Language', choices=[('english','English'),('french','French'),('spanish','Spanish'),('portugese','Portugese'),('hindi','Hindi')])
+	tier = SelectField('Your Tier?', choices=[(1, "One"), (2, "Two"), (2, "Three")], default=1)
+	gears = SelectMultipleField('Gears you want?', choices=[('shirt', "Firefox Shirt"), ('cap', "Firefox Cap"), ('hoodie', "Mozilla Hoodie")],)
+	comments = TextAreaField('Any Comments?', [validators.DataRequired()])
 	terms = BooleanField('I accept terms', [validators.DataRequired()])
 
 #
@@ -94,7 +100,9 @@ def submit():
 	if 'api_key' in session:
 		form = CustomForm()
 		if request.method == 'POST':
-			description = '\n>>Name' + '\n' + request.form['name'] + '\n>>Email' + '\n' + request.form['email'] + '\n>>I accept terms' + '\n' + request.form['terms']
+			description=''
+			for label, value in form.data.items():
+				description += '\n>>' + label + '\n' + str(value)
 			data = {
 			'product' : 'Firefox',
 			'component' : 'General',
@@ -103,10 +111,11 @@ def submit():
 			'description' : description,
 			'op_sys' : 'Mac OS X'
 			}
+			print(description)
 			r = requests.post(config.URL + '/rest/bug?api_key=' + session['api_key'], data=data)
 			print(r.status_code)
 			print(r.json())
-			return redirect('/')
+			return redirect(config.URL + '/show_bug.cgi?id=' + str(r.json()['id']))
 		return render_template('customform.html', form=form)
 	else:
 		return redirect('/')
