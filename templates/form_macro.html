@@ -6,7 +6,7 @@
 {% elif field.type in ('RadioField') %}
   {{ field(class='radio', placeholder='',**kwargs)|safe }}
 {% elif field.type in ('TextAreaField') %}
-  {{ field(class='materialize-textarea',style='color: #404040;height:22px;',**kwargs)|safe }}
+  {{ field(class='materialize-textarea',style='color: #404040;height:22px;',placeholder='',**kwargs)|safe }}
 {% elif field.type in ('SelectField') %}
   {{ field(class='',**kwargs)|safe }}
 {% else %}
