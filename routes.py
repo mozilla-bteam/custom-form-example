@@ -58,12 +58,12 @@ def submit():
 			for label, value in form.data.items():
 				description += '\n>>' + label + '\n' + str(value)
 			data = {
-			'product' : 'Firefox',
-			'component' : 'General',
-			'version' : 'unspecified',
-			'summary' : 'Custom Form Response',
+			'product' : config.PRODUCT,
+			'component' : config.COMPONENT,
+			'version' : config.VERSION,
+			'summary' : config.SUMMARY,
 			'description' : description,
-			'op_sys' : 'Mac OS X'
+			'op_sys' : config.OS
 			}
 			print(description)
 			r = requests.post(config.URL + '/rest/bug?api_key=' + session['api_key'], data=data)
